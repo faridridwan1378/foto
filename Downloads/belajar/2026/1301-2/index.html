@@ -1,0 +1,2041 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Varsha Fruits & Goods - Toko Buah Segar & Olahan Berkualitas">
+    <meta name="theme-color" content="#3abb69">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>Varsha Fruits & Goods 🍎</title>
+    
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    
+    <!-- External CSS -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍎</text></svg>">
+    
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Firebase SDK imports
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getFirestore, collection, doc, setDoc, getDoc, getDocs, onSnapshot, enableIndexedDbPersistence } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        
+        // Make Firebase available globally
+        window.FirebaseSDK = {
+            initializeApp,
+            getFirestore,
+            collection,
+            doc,
+            setDoc,
+            getDoc,
+            getDocs,
+            onSnapshot,
+            enableIndexedDbPersistence
+        };
+        
+        // Dispatch event when Firebase is ready
+        window.dispatchEvent(new Event('firebase-ready'));
+    </script>
+</head>
+<body class="bg-gray-50 text-gray-900 antialiased">
+    <!-- App Container -->
+    <div id="app" class="app-container">
+        
+        <!-- ==================== GLOBAL HEADER ==================== -->
+        <header class="global-header">
+            <div class="header-left" onclick="navigateTo('home')">
+                <div id="header-logo" class="header-logo">
+                    <span class="text-xl">🍎</span>
+                </div>
+                <div class="header-brand">
+                    <h1 id="header-store-name" class="header-title">Varsha</h1>
+                    <p id="header-tagline" class="header-subtitle">Fruits & Goods</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <button onclick="showCart()" class="header-cart-btn">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                    </svg>
+                    <span id="cart-badge-header" class="header-cart-badge hidden">0</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- ==================== PAGE: HOME ==================== -->
+        <div id="page-home" class="page active">
+            <!-- Main Content -->
+            <main class="main-content pt-0">
+                <!-- Search Bar -->
+                <div class="search-container">
+                    <div class="search-wrapper">
+                        <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                        <input type="text" id="search-input" class="search-input" placeholder="Cari buah segar...">
+                    </div>
+                </div>
+
+                <!-- Promo Banner -->
+                <div class="promo-banner">
+                    <div class="promo-content">
+                        <span class="promo-badge">FRESH</span>
+                        <p class="promo-text">Buah segar langsung dari petani! 🌱</p>
+                    </div>
+                    <span class="promo-icon">🍎</span>
+                </div>
+
+                <!-- Categories -->
+                <section class="section">
+                    <h2 class="section-title">Kategori</h2>
+                    <div id="categories-grid" class="categories-grid">
+                        <!-- Categories rendered by JS -->
+                    </div>
+                </section>
+
+                <!-- Products -->
+                <section class="section">
+                    <div class="section-header">
+                        <h2 class="section-title">Produk Segar</h2>
+                        <button onclick="navigateTo('katalog')" class="see-all-btn">Lihat Semua</button>
+                    </div>
+                    <div id="products-grid" class="products-grid">
+                        <!-- Products rendered by JS -->
+                    </div>
+                </section>
+            </main>
+        </div>
+
+        <!-- ==================== PAGE: KATALOG ==================== -->
+        <div id="page-katalog" class="page">
+            <main class="main-content pt-0">
+                <!-- Filter Chips -->
+                <div id="filter-chips" class="filter-chips">
+                    <!-- Filter chips rendered by JS -->
+                </div>
+
+                <!-- Search in Katalog -->
+                <div class="px-4 mb-4">
+                    <div class="search-wrapper">
+                        <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                        <input type="text" id="katalog-search" class="search-input" placeholder="Cari produk...">
+                    </div>
+                </div>
+
+                <!-- Products List -->
+                <div id="katalog-products" class="katalog-products">
+                    <!-- Products rendered by JS -->
+                </div>
+            </main>
+        </div>
+
+        <!-- ==================== PAGE: TRANSAKSI (CART) ==================== -->
+        <div id="page-transaksi" class="page">
+            <!-- Cart Sub-header -->
+            <div class="sub-header">
+                <h2 class="sub-header-title">🛒 Keranjang Belanja</h2>
+                <button onclick="clearCart()" class="sub-header-action text-red-500">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                    Kosongkan
+                </button>
+            </div>
+
+            <main class="main-content cart-content pt-0">
+                <!-- Empty State -->
+                <div id="cart-empty" class="empty-state">
+                    <div class="empty-icon">🛒</div>
+                    <h3 class="empty-title">Keranjang Kosong</h3>
+                    <p class="empty-text">Yuk mulai belanja buah segar!</p>
+                    <button onclick="navigateTo('katalog')" class="btn-primary mt-4">
+                        Mulai Belanja
+                    </button>
+                </div>
+
+                <!-- Cart Items -->
+                <div id="cart-items" class="cart-items hidden">
+                    <!-- Cart items rendered by JS -->
+                </div>
+
+                <!-- Login Notice for Guest -->
+                <div id="cart-login-notice" class="cart-login-notice hidden">
+                    <div class="login-notice-icon">🔐</div>
+                    <div class="login-notice-content">
+                        <h4>Login untuk Checkout</h4>
+                        <p>Silakan login atau daftar untuk melanjutkan pemesanan</p>
+                    </div>
+                    <button onclick="navigateTo('akun')" class="btn-login-notice">
+                        Login / Daftar
+                    </button>
+                </div>
+
+                <!-- Checkout Section -->
+                <div id="checkout-section" class="checkout-section hidden">
+                    <div class="checkout-summary">
+                        <div class="summary-row">
+                            <span class="text-gray-600">Subtotal</span>
+                            <span id="subtotal" class="font-semibold">Rp 0</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="text-gray-600">Ongkir</span>
+                            <span id="shipping" class="font-semibold text-orange-500">Dihitung setelah konfirmasi</span>
+                        </div>
+                        <div class="summary-divider"></div>
+                        <div class="summary-row">
+                            <span class="font-bold text-lg">Subtotal Belanja</span>
+                            <span id="total" class="font-bold text-lg text-green-600">Rp 0</span>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">* Ongkir akan dikonfirmasi oleh admin via WhatsApp</p>
+                    </div>
+                    <button id="btn-checkout-main" onclick="handleCheckout()" class="btn-checkout">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                        </svg>
+                        <span id="checkout-btn-text">Pesan via WhatsApp</span>
+                    </button>
+                </div>
+            </main>
+        </div>
+
+        <!-- ==================== PAGE: AKUN ==================== -->
+        <div id="page-akun" class="page">
+            <main class="main-content pt-0">
+                <!-- Guest View (Not Logged In) -->
+                <div id="guest-view">
+                    <div class="auth-welcome">
+                        <div class="auth-welcome-icon">👋</div>
+                        <h2 class="auth-welcome-title">Selamat Datang!</h2>
+                        <p class="auth-welcome-text">Masuk atau daftar untuk menikmati kemudahan berbelanja</p>
+                    </div>
+
+                    <div class="auth-benefits">
+                        <div class="benefit-item">
+                            <span class="benefit-icon">🚀</span>
+                            <div class="benefit-content">
+                                <h4>Checkout Lebih Cepat</h4>
+                                <p>Data alamat otomatis terisi</p>
+                            </div>
+                        </div>
+                        <div class="benefit-item">
+                            <span class="benefit-icon">📋</span>
+                            <div class="benefit-content">
+                                <h4>Riwayat Pesanan</h4>
+                                <p>Lacak semua pesanan Anda</p>
+                            </div>
+                        </div>
+                        <div class="benefit-item">
+                            <span class="benefit-icon">💝</span>
+                            <div class="benefit-content">
+                                <h4>Promo Khusus</h4>
+                                <p>Dapatkan penawaran spesial</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="auth-buttons">
+                        <button onclick="openModal('modal-login')" class="btn-auth-primary">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                            </svg>
+                            Masuk
+                        </button>
+                        <button onclick="openModal('modal-register')" class="btn-auth-secondary">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                            </svg>
+                            Daftar Akun Baru
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Logged In View -->
+                <div id="user-view" class="hidden">
+                    <!-- User Profile Card -->
+                    <div class="user-profile-card">
+                        <div id="user-avatar" class="user-avatar">
+                            <span class="text-3xl">👤</span>
+                        </div>
+                        <div class="user-info">
+                            <h3 id="user-name" class="user-name">Nama Pelanggan</h3>
+                            <p id="user-phone" class="user-phone">+62812xxxxxxxx</p>
+                            <span id="user-label" class="user-label regular">Regular</span>
+                        </div>
+                    </div>
+
+                    <!-- User Stats -->
+                    <div class="user-stats">
+                        <div class="user-stat-item">
+                            <span id="user-orders-count" class="user-stat-value">0</span>
+                            <span class="user-stat-label">Pesanan</span>
+                        </div>
+                        <div class="user-stat-item">
+                            <span id="user-total-spent" class="user-stat-value">Rp 0</span>
+                            <span class="user-stat-label">Total Belanja</span>
+                        </div>
+                    </div>
+
+                    <!-- User Menu -->
+                    <div class="menu-section">
+                        <h4 class="menu-section-title">Akun Saya</h4>
+                        <div class="menu-list">
+                            <button onclick="openModal('modal-edit-profile')" class="menu-item">
+                                <div class="menu-item-icon bg-blue-100 text-blue-600">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                    </svg>
+                                </div>
+                                <div class="menu-item-content">
+                                    <span class="menu-item-title">Edit Profil</span>
+                                    <span class="menu-item-desc">Ubah nama, alamat, foto</span>
+                                </div>
+                                <svg class="menu-item-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </button>
+
+                            <button onclick="openModal('modal-my-orders')" class="menu-item">
+                                <div class="menu-item-icon bg-orange-100 text-orange-600">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                    </svg>
+                                </div>
+                                <div class="menu-item-content">
+                                    <span class="menu-item-title">Pesanan Saya</span>
+                                    <span class="menu-item-desc">Lihat riwayat pesanan</span>
+                                </div>
+                                <svg class="menu-item-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </button>
+
+                            <button onclick="openModal('modal-change-pin')" class="menu-item">
+                                <div class="menu-item-icon bg-purple-100 text-purple-600">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                    </svg>
+                                </div>
+                                <div class="menu-item-content">
+                                    <span class="menu-item-title">Ubah PIN</span>
+                                    <span class="menu-item-desc">Ganti PIN keamanan</span>
+                                </div>
+                                <svg class="menu-item-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button onclick="handleLogout()" class="btn-logout-full">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                        </svg>
+                        Keluar
+                    </button>
+                </div>
+            </main>
+        </div>
+
+        <!-- ==================== PAGE: PROFIL ==================== -->
+        <div id="page-profil" class="page">
+            <!-- Admin Login Required View -->
+            <div id="admin-guest-view" class="main-content pt-0">
+                <div class="auth-welcome">
+                    <div class="auth-welcome-icon">🔐</div>
+                    <h2 class="auth-welcome-title">Area Admin</h2>
+                    <p class="auth-welcome-text">Login untuk mengelola toko</p>
+                </div>
+
+                <div class="auth-benefits">
+                    <div class="benefit-item">
+                        <span class="benefit-icon">📦</span>
+                        <div class="benefit-content">
+                            <h4>Kelola Produk</h4>
+                            <p>Tambah, edit, hapus katalog</p>
+                        </div>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="benefit-icon">📋</span>
+                        <div class="benefit-content">
+                            <h4>Kelola Pesanan</h4>
+                            <p>Proses pesanan masuk</p>
+                        </div>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="benefit-icon">👥</span>
+                        <div class="benefit-content">
+                            <h4>Data Pelanggan</h4>
+                            <p>Lihat daftar pelanggan</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="auth-buttons">
+                    <button onclick="openModal('modal-admin-login')" class="btn-auth-primary">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                        </svg>
+                        Login Admin
+                    </button>
+                    <button onclick="openModal('modal-admin-register')" class="btn-auth-secondary">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                        </svg>
+                        Daftar Admin Baru
+                    </button>
+                </div>
+            </div>
+
+            <!-- Admin Logged In View -->
+            <main id="admin-logged-view" class="main-content pt-0 hidden">
+                <!-- Admin Profile Card -->
+                <div class="profile-card" style="background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);">
+                    <div id="admin-avatar-display" class="profile-avatar" style="background: rgba(255,255,255,0.2);">
+                        <span class="text-4xl">👨‍💼</span>
+                    </div>
+                    <div class="profile-info">
+                        <h3 id="admin-name-display" class="profile-name">Admin</h3>
+                        <p id="admin-role-display" class="profile-subtitle">Owner</p>
+                    </div>
+                </div>
+
+                <!-- Store Info Card -->
+                <div class="profile-card" style="margin-top: var(--spacing-md);">
+                    <div id="profile-store-logo" class="profile-avatar">
+                        <span class="text-4xl">🍎</span>
+                    </div>
+                    <div class="profile-info">
+                        <h3 id="profile-store-name" class="profile-name">Varsha</h3>
+                        <p id="profile-store-tagline" class="profile-subtitle">Fruits & Goods</p>
+                    </div>
+                </div>
+
+                <!-- Menu Items -->
+                <div class="menu-section">
+                    <h4 class="menu-section-title">Kelola Toko</h4>
+                    <div class="menu-list">
+                        <button onclick="openModal('modal-profile')" class="menu-item">
+                            <div class="menu-item-icon bg-green-100 text-green-600">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                </svg>
+                            </div>
+                            <div class="menu-item-content">
+                                <span class="menu-item-title">Profil Toko</span>
+                                <span class="menu-item-desc">Logo, nama, kontak, lokasi</span>
+                            </div>
+                            <svg class="menu-item-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+
+                        <button onclick="openModal('modal-products')" class="menu-item">
+                            <div class="menu-item-icon bg-orange-100 text-orange-600">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                                </svg>
+                            </div>
+                            <div class="menu-item-content">
+                                <span class="menu-item-title">Kelola Produk</span>
+                                <span class="menu-item-desc">Tambah, edit, hapus produk</span>
+                            </div>
+                            <svg class="menu-item-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+
+                        <button onclick="openModal('modal-orders')" class="menu-item">
+                            <div class="menu-item-icon bg-blue-100 text-blue-600">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                                </svg>
+                            </div>
+                            <div class="menu-item-content">
+                                <span class="menu-item-title">Kelola Pesanan</span>
+                                <span class="menu-item-desc">Lihat dan kelola pesanan masuk</span>
+                            </div>
+                            <div class="menu-item-badge" id="orders-badge-menu"></div>
+                            <svg class="menu-item-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+
+                        <button onclick="openModal('modal-customers')" class="menu-item">
+                            <div class="menu-item-icon bg-purple-100 text-purple-600">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                </svg>
+                            </div>
+                            <div class="menu-item-content">
+                                <span class="menu-item-title">Daftar Pelanggan</span>
+                                <span class="menu-item-desc">Kelola data pelanggan terdaftar</span>
+                            </div>
+                            <div class="menu-item-badge" id="customers-badge-menu"></div>
+                            <svg class="menu-item-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="menu-section">
+                    <h4 class="menu-section-title">Statistik</h4>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <span class="stat-icon">📦</span>
+                            <span id="stat-products" class="stat-value">0</span>
+                            <span class="stat-label">Produk</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-icon">🍎</span>
+                            <span id="stat-buah" class="stat-value">0</span>
+                            <span class="stat-label">Buah</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-icon">🍯</span>
+                            <span id="stat-goods" class="stat-value">0</span>
+                            <span class="stat-label">Olahan</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-icon">🥤</span>
+                            <span id="stat-drinks" class="stat-value">0</span>
+                            <span class="stat-label">Minuman</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Management (Owner Only) -->
+                <div id="admin-management-section" class="menu-section hidden">
+                    <h4 class="menu-section-title">Manajemen Admin</h4>
+                    <div class="menu-list">
+                        <button onclick="openModal('modal-admin-profile')" class="menu-item">
+                            <div class="menu-item-icon bg-indigo-100 text-indigo-600">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                </svg>
+                            </div>
+                            <div class="menu-item-content">
+                                <span class="menu-item-title">Profil Admin</span>
+                                <span class="menu-item-desc">Edit profil & ubah password</span>
+                            </div>
+                            <svg class="menu-item-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+
+                        <button id="btn-manage-admins" onclick="openModal('modal-manage-admins')" class="menu-item hidden">
+                            <div class="menu-item-icon bg-pink-100 text-pink-600">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                                </svg>
+                            </div>
+                            <div class="menu-item-content">
+                                <span class="menu-item-title">Kelola Admin</span>
+                                <span class="menu-item-desc">Tambah atau hapus admin</span>
+                            </div>
+                            <div class="menu-item-badge" id="admins-badge-menu"></div>
+                            <svg class="menu-item-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+
+                        <button id="btn-firebase-setup" onclick="openModal('modal-firebase')" class="menu-item hidden">
+                            <div class="menu-item-icon bg-yellow-100 text-yellow-600">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/>
+                                </svg>
+                            </div>
+                            <div class="menu-item-content">
+                                <span class="menu-item-title">Firebase & Database</span>
+                                <span class="menu-item-desc">Konfigurasi cloud database</span>
+                            </div>
+                            <div class="menu-item-badge" id="firebase-status-badge"></div>
+                            <svg class="menu-item-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Logout Button -->
+                <button onclick="handleAdminLogout()" class="btn-logout-full">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                    </svg>
+                    Logout Admin
+                </button>
+
+                <!-- App Info -->
+                <div class="app-info">
+                    <p class="text-gray-500 text-sm">Varsha Fruits & Goods v1.0</p>
+                    <p class="text-gray-400 text-xs mt-1">Made with ❤️ for fresh fruits lovers</p>
+                </div>
+            </main>
+        </div>
+
+        <!-- ==================== BOTTOM NAVIGATION ==================== -->
+        <nav class="bottom-nav">
+            <button onclick="navigateTo('akun')" class="nav-item" data-page="akun">
+                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                </svg>
+                <span class="nav-label">Akun</span>
+            </button>
+            <button onclick="navigateTo('katalog')" class="nav-item" data-page="katalog">
+                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                </svg>
+                <span class="nav-label">Katalog</span>
+            </button>
+            <button onclick="navigateTo('profil')" class="nav-item" data-page="profil">
+                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                <span class="nav-label">Setting</span>
+            </button>
+        </nav>
+
+        <!-- ==================== MODALS ==================== -->
+        
+        <!-- Modal: Store Profile -->
+        <div id="modal-profile" class="modal">
+            <div class="modal-overlay" onclick="closeModal('modal-profile')"></div>
+            <div class="modal-content modal-full">
+                <div class="modal-header">
+                    <button onclick="closeModal('modal-profile')" class="modal-back">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    <h2 class="modal-title">Profil Toko</h2>
+                    <button onclick="saveStoreProfile()" class="modal-save">Simpan</button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-profile" class="form-container">
+                        <!-- Logo Section -->
+                        <div class="form-section">
+                            <label class="form-label">Logo Toko</label>
+                            <div class="logo-picker-container">
+                                <div id="logo-preview" class="logo-preview" onclick="toggleLogoPicker()">
+                                    <span class="text-4xl">🍎</span>
+                                </div>
+                                <div class="logo-input-group">
+                                    <input type="url" id="input-logo-url" class="form-input" placeholder="URL gambar logo...">
+                                    <p class="form-hint">Atau pilih emoji dengan tap logo</p>
+                                </div>
+                            </div>
+                            <div id="emoji-picker-logo" class="emoji-picker hidden">
+                                <!-- Emoji grid rendered by JS -->
+                            </div>
+                            <input type="hidden" id="input-logo-emoji" value="🍎">
+                        </div>
+
+                        <!-- Store Info -->
+                        <div class="form-section">
+                            <label class="form-label">Nama Toko *</label>
+                            <input type="text" id="input-store-name" class="form-input" placeholder="Varsha Fruits" required>
+                        </div>
+
+                        <div class="form-section">
+                            <label class="form-label">Tagline</label>
+                            <input type="text" id="input-tagline" class="form-input" placeholder="Fruits & Goods">
+                        </div>
+
+                        <!-- Contact -->
+                        <div class="form-divider">Kontak</div>
+                        
+                        <div class="form-section">
+                            <label class="form-label">WhatsApp *</label>
+                            <div class="input-with-prefix">
+                                <span class="input-prefix">+62</span>
+                                <input type="tel" id="input-whatsapp" class="form-input" placeholder="812-3456-7890" inputmode="tel" required>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <label class="form-label">Email</label>
+                            <input type="email" id="input-email" class="form-input" placeholder="hello@varsha.com" inputmode="email">
+                        </div>
+
+                        <div class="form-section">
+                            <label class="form-label">Instagram</label>
+                            <div class="input-with-prefix">
+                                <span class="input-prefix">@</span>
+                                <input type="text" id="input-instagram" class="form-input" placeholder="varshafruits">
+                            </div>
+                        </div>
+
+                        <!-- Bank -->
+                        <div class="form-divider">Pembayaran</div>
+                        
+                        <div class="form-section">
+                            <label class="form-label">Bank</label>
+                            <select id="input-bank" class="form-select">
+                                <option value="">Pilih Bank</option>
+                                <option value="BCA">BCA</option>
+                                <option value="BNI">BNI</option>
+                                <option value="BRI">BRI</option>
+                                <option value="Mandiri">Mandiri</option>
+                                <option value="BSI">BSI</option>
+                                <option value="DANA">DANA</option>
+                                <option value="GoPay">GoPay</option>
+                                <option value="OVO">OVO</option>
+                                <option value="ShopeePay">ShopeePay</option>
+                            </select>
+                        </div>
+
+                        <div class="form-section">
+                            <label class="form-label">Nomor Rekening</label>
+                            <input type="text" id="input-account-number" class="form-input" placeholder="1234567890" inputmode="numeric">
+                        </div>
+
+                        <div class="form-section">
+                            <label class="form-label">Atas Nama</label>
+                            <input type="text" id="input-account-name" class="form-input" placeholder="Nama pemilik rekening">
+                        </div>
+
+                        <!-- Location -->
+                        <div class="form-divider">Lokasi</div>
+                        
+                        <div class="form-section">
+                            <label class="form-label">Alamat</label>
+                            <textarea id="input-address" class="form-textarea" rows="2" placeholder="Jl. Buah Segar No. 123"></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-section flex-1">
+                                <label class="form-label">Kota</label>
+                                <input type="text" id="input-city" class="form-input" placeholder="Jakarta">
+                            </div>
+                            <div class="form-section w-28">
+                                <label class="form-label">Kode Pos</label>
+                                <input type="text" id="input-postal" class="form-input" placeholder="12345" inputmode="numeric">
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <label class="form-label">Link Google Maps</label>
+                            <input type="url" id="input-maps" class="form-input" placeholder="https://maps.google.com/...">
+                        </div>
+
+                        <!-- Hours -->
+                        <div class="form-divider">Jam Operasional</div>
+                        
+                        <div class="hours-grid">
+                            <div class="hours-row">
+                                <span class="hours-label">Senin - Jumat</span>
+                                <input type="time" id="input-weekday-open" class="form-time" value="07:00">
+                                <span class="hours-separator">-</span>
+                                <input type="time" id="input-weekday-close" class="form-time" value="21:00">
+                            </div>
+                            <div class="hours-row">
+                                <span class="hours-label">Sabtu</span>
+                                <input type="time" id="input-saturday-open" class="form-time" value="08:00">
+                                <span class="hours-separator">-</span>
+                                <input type="time" id="input-saturday-close" class="form-time" value="20:00">
+                            </div>
+                            <div class="hours-row">
+                                <span class="hours-label">Minggu</span>
+                                <input type="time" id="input-sunday-open" class="form-time" value="09:00">
+                                <span class="hours-separator">-</span>
+                                <input type="time" id="input-sunday-close" class="form-time" value="18:00">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Products Management -->
+        <div id="modal-products" class="modal">
+            <div class="modal-overlay" onclick="closeModal('modal-products')"></div>
+            <div class="modal-content modal-full">
+                <div class="modal-header">
+                    <button onclick="closeModal('modal-products')" class="modal-back">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    <h2 class="modal-title">Kelola Produk</h2>
+                    <button onclick="openModal('modal-add-product')" class="modal-action">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="modal-body p-0">
+                    <!-- Search -->
+                    <div class="p-4 bg-white sticky top-0 z-10 border-b">
+                        <div class="search-wrapper">
+                            <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                            <input type="text" id="admin-search" class="search-input" placeholder="Cari produk...">
+                        </div>
+                    </div>
+                    
+                    <!-- Products List -->
+                    <div id="admin-products-list" class="admin-products-list">
+                        <!-- Rendered by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Add/Edit Product -->
+        <div id="modal-add-product" class="modal">
+            <div class="modal-overlay" onclick="closeModal('modal-add-product')"></div>
+            <div class="modal-content modal-full">
+                <div class="modal-header">
+                    <button onclick="closeModal('modal-add-product')" class="modal-back">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    <h2 id="modal-product-title" class="modal-title">Tambah Produk</h2>
+                    <button onclick="saveProduct()" class="modal-save">Simpan</button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-product" class="form-container">
+                        <input type="hidden" id="product-id">
+                        
+                        <!-- Image -->
+                        <div class="form-section">
+                            <label class="form-label">Gambar Produk</label>
+                            <div class="product-image-picker">
+                                <div id="product-image-preview" class="product-image-preview" onclick="toggleProductEmojiPicker()">
+                                    <span class="text-5xl">🍎</span>
+                                </div>
+                                <div class="flex-1">
+                                    <input type="url" id="input-product-image" class="form-input mb-2" placeholder="URL gambar produk...">
+                                    <p class="form-hint">Atau pilih emoji dengan tap gambar</p>
+                                </div>
+                            </div>
+                            <div id="emoji-picker-product" class="emoji-picker hidden">
+                                <!-- Rendered by JS -->
+                            </div>
+                            <input type="hidden" id="input-product-emoji" value="🍎">
+                        </div>
+
+                        <!-- Basic Info -->
+                        <div class="form-section">
+                            <label class="form-label">Nama Produk *</label>
+                            <input type="text" id="input-product-name" class="form-input" placeholder="Apel Fuji Premium" required>
+                        </div>
+
+                        <div class="form-section">
+                            <label class="form-label">Deskripsi</label>
+                            <textarea id="input-product-desc" class="form-textarea" rows="2" placeholder="Deskripsi singkat..."></textarea>
+                        </div>
+
+                        <div class="form-section">
+                            <label class="form-label">Kategori *</label>
+                            <select id="input-product-category" class="form-select" required>
+                                <option value="">Pilih Kategori</option>
+                                <option value="buah">🍎 Buah Segar</option>
+                                <option value="goods">🍯 Olahan</option>
+                                <option value="minuman">🥤 Minuman</option>
+                            </select>
+                        </div>
+
+                        <!-- Pricing -->
+                        <div class="form-divider">Harga</div>
+                        
+                        <div class="form-row">
+                            <div class="form-section flex-1">
+                                <label class="form-label">Harga Jual *</label>
+                                <div class="input-with-prefix">
+                                    <span class="input-prefix">Rp</span>
+                                    <input type="number" id="input-product-price" class="form-input" placeholder="35000" inputmode="numeric" required>
+                                </div>
+                            </div>
+                            <div class="form-section flex-1">
+                                <label class="form-label">Harga Asli</label>
+                                <div class="input-with-prefix">
+                                    <span class="input-prefix">Rp</span>
+                                    <input type="number" id="input-product-original" class="form-input" placeholder="45000" inputmode="numeric">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Stock -->
+                        <div class="form-divider">Stok</div>
+                        
+                        <div class="form-row">
+                            <div class="form-section flex-1">
+                                <label class="form-label">Jumlah Stok *</label>
+                                <input type="number" id="input-product-stock" class="form-input" placeholder="50" inputmode="numeric" required>
+                            </div>
+                            <div class="form-section flex-1">
+                                <label class="form-label">Satuan</label>
+                                <select id="input-product-unit" class="form-select">
+                                    <option value="kg">kg</option>
+                                    <option value="buah">buah</option>
+                                    <option value="pack">pack</option>
+                                    <option value="botol">botol</option>
+                                    <option value="sisir">sisir</option>
+                                    <option value="cup">cup</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <label class="form-label">Rating (1-5)</label>
+                            <input type="number" id="input-product-rating" class="form-input" placeholder="4.5" step="0.1" min="1" max="5" inputmode="decimal">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Delete Confirmation -->
+        <div id="modal-delete" class="modal">
+            <div class="modal-overlay" onclick="closeModal('modal-delete')"></div>
+            <div class="modal-content modal-center">
+                <div class="delete-modal-content">
+                    <div class="delete-icon">🗑️</div>
+                    <h3 class="delete-title">Hapus Produk?</h3>
+                    <p id="delete-product-name" class="delete-text">Produk akan dihapus permanen.</p>
+                    <div class="delete-actions">
+                        <button onclick="closeModal('modal-delete')" class="btn-secondary flex-1">Batal</button>
+                        <button onclick="confirmDeleteProduct()" class="btn-danger flex-1">Hapus</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Orders Management -->
+        <div id="modal-orders" class="modal">
+            <div class="modal-overlay" onclick="closeModal('modal-orders')"></div>
+            <div class="modal-content modal-full">
+                <div class="modal-header">
+                    <button onclick="closeModal('modal-orders')" class="modal-back">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    <h2 class="modal-title">Kelola Pesanan</h2>
+                    <div class="w-10"></div>
+                </div>
+                <div class="modal-body p-0">
+                    <!-- Order Stats -->
+                    <div class="order-stats-bar">
+                        <button class="order-stat-chip active" onclick="filterOrders('all')">
+                            <span>Semua</span>
+                            <span id="stat-all-orders" class="order-stat-count">0</span>
+                        </button>
+                        <button class="order-stat-chip" onclick="filterOrders('pending')">
+                            <span>🕐 Pending</span>
+                            <span id="stat-pending" class="order-stat-count">0</span>
+                        </button>
+                        <button class="order-stat-chip" onclick="filterOrders('confirmed')">
+                            <span>✅ Dikonfirmasi</span>
+                            <span id="stat-confirmed" class="order-stat-count">0</span>
+                        </button>
+                        <button class="order-stat-chip" onclick="filterOrders('completed')">
+                            <span>📦 Selesai</span>
+                            <span id="stat-completed" class="order-stat-count">0</span>
+                        </button>
+                    </div>
+
+                    <!-- Orders List -->
+                    <div id="orders-list" class="orders-list">
+                        <!-- Rendered by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Order Detail -->
+        <div id="modal-order-detail" class="modal">
+            <div class="modal-overlay" onclick="closeModal('modal-order-detail')"></div>
+            <div class="modal-content modal-full">
+                <div class="modal-header">
+                    <button onclick="closeModal('modal-order-detail')" class="modal-back">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    <h2 class="modal-title">Detail Pesanan</h2>
+                    <button onclick="deleteOrder()" class="modal-action text-red-500">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="order-detail-content">
+                        <!-- Rendered by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Customers Management -->
+        <div id="modal-customers" class="modal">
+            <div class="modal-overlay" onclick="closeModal('modal-customers')"></div>
+            <div class="modal-content modal-full">
+                <div class="modal-header">
+                    <button onclick="closeModal('modal-customers')" class="modal-back">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    <h2 class="modal-title">Daftar Pelanggan</h2>
+                    <button onclick="openModal('modal-add-customer')" class="modal-action">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="modal-body p-0">
+                    <!-- Customer Stats -->
+                    <div class="customer-stats-bar">
+                        <div class="customer-stat-item">
+                            <span class="customer-stat-value" id="stat-total-customers">0</span>
+                            <span class="customer-stat-label">Total</span>
+                        </div>
+                        <div class="customer-stat-item">
+                            <span class="customer-stat-value" id="stat-active-customers">0</span>
+                            <span class="customer-stat-label">Aktif</span>
+                        </div>
+                        <div class="customer-stat-item">
+                            <span class="customer-stat-value" id="stat-total-orders-customers">0</span>
+                            <span class="customer-stat-label">Pesanan</span>
+                        </div>
+                    </div>
+
+                    <!-- Search -->
+                    <div class="p-4 bg-white sticky top-0 z-10 border-b">
+                        <div class="search-wrapper">
+                            <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                            <input type="text" id="customer-search" class="search-input" placeholder="Cari pelanggan...">
+                        </div>
+                    </div>
+
+                    <!-- Customers List -->
+                    <div id="customers-list" class="customers-list">
+                        <!-- Rendered by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Add/Edit Customer -->
+        <div id="modal-add-customer" class="modal">
+            <div class="modal-overlay" onclick="closeModal('modal-add-customer')"></div>
+            <div class="modal-content modal-full">
+                <div class="modal-header">
+                    <button onclick="closeModal('modal-add-customer')" class="modal-back">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    <h2 id="modal-customer-title" class="modal-title">Tambah Pelanggan</h2>
+                    <button onclick="saveCustomer()" class="modal-save">Simpan</button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-customer" class="form-container">
+                        <input type="hidden" id="customer-id">
+
+                        <!-- Avatar -->
+                        <div class="form-section">
+                            <label class="form-label">Avatar</label>
+                            <div class="customer-avatar-picker">
+                                <div id="customer-avatar-preview" class="customer-avatar-preview" onclick="toggleCustomerAvatarPicker()">
+                                    <span class="text-4xl">👤</span>
+                                </div>
+                                <div class="flex-1">
+                                    <input type="url" id="input-customer-avatar" class="form-input mb-2" placeholder="URL foto pelanggan...">
+                                    <p class="form-hint">Atau pilih avatar dengan tap gambar</p>
+                                </div>
+                            </div>
+                            <div id="avatar-picker" class="emoji-picker hidden">
+                                <!-- Rendered by JS -->
+                            </div>
+                            <input type="hidden" id="input-customer-emoji" value="👤">
+                        </div>
+
+                        <!-- Basic Info -->
+                        <div class="form-section">
+                            <label class="form-label">Nama Lengkap *</label>
+                            <input type="text" id="input-customer-name" class="form-input" placeholder="Nama pelanggan" required>
+                        </div>
+
+                        <div class="form-section">
+                            <label class="form-label">No. WhatsApp *</label>
+                            <div class="input-with-prefix">
+                                <span class="input-prefix">+62</span>
+                                <input type="tel" id="input-customer-phone" class="form-input" placeholder="812xxxxxxxx" inputmode="tel" required>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <label class="form-label">Email</label>
+                            <input type="email" id="input-customer-email" class="form-input" placeholder="email@example.com" inputmode="email">
+                        </div>
+
+                        <!-- Address -->
+                        <div class="form-divider">Alamat Pengiriman</div>
+
+                        <div class="form-section">
+                            <label class="form-label">Alamat Lengkap</label>
+                            <textarea id="input-customer-address" class="form-textarea" rows="2" placeholder="Jl. Contoh No. 123, RT/RW"></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-section flex-1">
+                                <label class="form-label">Kelurahan</label>
+                                <input type="text" id="input-customer-kelurahan" class="form-input" placeholder="Kelurahan">
+                            </div>
+                            <div class="form-section flex-1">
+                                <label class="form-label">Kecamatan</label>
+                                <input type="text" id="input-customer-kecamatan" class="form-input" placeholder="Kecamatan">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-section flex-1">
+                                <label class="form-label">Kota</label>
+                                <input type="text" id="input-customer-city" class="form-input" placeholder="Jakarta">
+                            </div>
+                            <div class="form-section w-28">
+                                <label class="form-label">Kode Pos</label>
+                                <input type="text" id="input-customer-postal" class="form-input" placeholder="12345" inputmode="numeric">
+                            </div>
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="form-divider">Catatan</div>
+
+                        <div class="form-section">
+                            <label class="form-label">Catatan Pelanggan</label>
+                            <textarea id="input-customer-notes" class="form-textarea" rows="2" placeholder="Catatan khusus untuk pelanggan ini..."></textarea>
+                        </div>
+
+                        <div class="form-section">
+                            <label class="form-label">Label</label>
+                            <div class="customer-labels">
+                                <button type="button" class="label-chip" data-label="vip" onclick="toggleCustomerLabel(this)">⭐ VIP</button>
+                                <button type="button" class="label-chip" data-label="regular" onclick="toggleCustomerLabel(this)">👤 Regular</button>
+                                <button type="button" class="label-chip" data-label="new" onclick="toggleCustomerLabel(this)">🆕 Baru</button>
+                                <button type="button" class="label-chip" data-label="wholesale" onclick="toggleCustomerLabel(this)">🏢 Grosir</button>
+                            </div>
+                            <input type="hidden" id="input-customer-label" value="regular">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Customer Detail -->
+        <div id="modal-customer-detail" class="modal">
+            <div class="modal-overlay" onclick="closeModal('modal-customer-detail')"></div>
+            <div class="modal-content modal-full">
+                <div class="modal-header">
+                    <button onclick="closeModal('modal-customer-detail')" class="modal-back">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    <h2 class="modal-title">Detail Pelanggan</h2>
+                    <button onclick="deleteCustomer()" class="modal-action text-red-500">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="customer-detail-content">
+                        <!-- Rendered by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Delete Customer Confirmation -->
+        <div id="modal-delete-customer" class="modal">
+            <div class="modal-overlay" onclick="closeModal('modal-delete-customer')"></div>
+            <div class="modal-content modal-center">
+                <div class="delete-modal-content">
+                    <div class="delete-icon">👤</div>
+                    <h3 class="delete-title">Hapus Pelanggan?</h3>
+                    <p id="delete-customer-name" class="delete-text">Pelanggan akan dihapus permanen.</p>
+                    <div class="delete-actions">
+                        <button onclick="closeModal('modal-delete-customer')" class="btn-secondary flex-1">Batal</button>
+                        <button onclick="confirmDeleteCustomer()" class="btn-danger flex-1">Hapus</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Login -->
+        <div id="modal-login" class="modal">
+            <div class="modal-overlay" onclick="closeModal('modal-login')"></div>
+            <div class="modal-content modal-center" style="max-width: 380px;">
+                <div class="auth-modal-content">
+                    <div class="auth-modal-header">
+                        <div class="auth-modal-icon">🔐</div>
+                        <h3 class="auth-modal-title">Masuk</h3>
+                        <p class="auth-modal-subtitle">Masukkan nomor HP dan PIN Anda</p>
+                    </div>
+                    <form id="form-login" class="auth-form" onsubmit="handleLogin(event)">
+                        <div class="form-section">
+                            <label class="form-label">Nomor WhatsApp</label>
+                            <div class="input-with-prefix">
+                                <span class="input-prefix">+62</span>
+                                <input type="tel" id="login-phone" class="form-input" placeholder="812xxxxxxxx" inputmode="tel" required>
+                            </div>
+                        </div>
+                        <div class="form-section">
+                            <label class="form-label">PIN (6 digit)</label>
+                            <input type="password" id="login-pin" class="form-input pin-input" placeholder="••••••" maxlength="6" inputmode="numeric" pattern="[0-9]{6}" required>
+                        </div>
+                        <button type="submit" class="btn-auth-submit">
+                            Masuk
+                        </button>
+                    </form>
+                    <div class="auth-modal-footer">
+                        <p>Belum punya akun? <button onclick="closeModal('modal-login'); openModal('modal-register')" class="auth-link">Daftar</button></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Register -->
+        <div id="modal-register" class="modal">
+            <div class="modal-overlay" onclick="closeModal('modal-register')"></div>
+            <div class="modal-content modal-full">
+                <div class="modal-header">
+                    <button onclick="closeModal('modal-register')" class="modal-back">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    <h2 class="modal-title">Daftar Akun</h2>
+                    <div class="w-10"></div>
+                </div>
+                <div class="modal-body">
+                    <form id="form-register" class="form-container" onsubmit="handleRegister(event)">
+                        <!-- Avatar -->
+                        <div class="form-section">
+                            <label class="form-label">Foto Profil</label>
+                            <div class="customer-avatar-picker">
+                                <div id="register-avatar-preview" class="customer-avatar-preview" onclick="toggleRegisterAvatarPicker()">
+                                    <span class="text-4xl">👤</span>
+                                </div>
+                                <div class="flex-1">
+                                    <input type="url" id="register-avatar-url" class="form-input mb-2" placeholder="URL foto profil..." oninput="updateRegisterAvatarPreview()">
+                                    <p class="form-hint">Atau pilih avatar dengan tap gambar</p>
+                                </div>
+                            </div>
+                            <div id="register-avatar-picker" class="emoji-picker hidden">
+                                <!-- Rendered by JS -->
+                            </div>
+                            <input type="hidden" id="register-avatar-emoji" value="👤">
+                        </div>
+
+                        <!-- Basic Info -->
+                        <div class="form-section">
+                            <label class="form-label">Nama Lengkap *</label>
+                            <input type="text" id="register-name" class="form-input" placeholder="Nama lengkap Anda" required>
+                        </div>
+
+                        <div class="form-section">
+                            <label class="form-label">Nomor WhatsApp *</label>
+                            <div class="input-with-prefix">
+                                <span class="input-prefix">+62</span>
+                                <input type="tel" id="register-phone" class="form-input" placeholder="812xxxxxxxx" inputmode="tel" required>
+                            </div>
+                            <p class="form-hint">Nomor ini akan digunakan untuk login</p>
+                        </div>
+
+                        <div class="form-section">
+                            <label class="form-label">Email</label>
+                            <input type="email" id="register-email" class="form-input" placeholder="email@example.com" inputmode="email">
+                        </div>
+
+                        <!-- PIN -->
+                        <div class="form-divider">Keamanan</div>
+
+                        <div class="form-section">
+                            <label class="form-label">Buat PIN (6 digit) *</label>
+                            <input type="password" id="register-pin" class="form-input pin-input" placeholder="••••••" maxlength="6" inputmode="numeric" pattern="[0-9]{6}" required>
+                            <p class="form-hint">PIN minimal 6 digit angka untuk keamanan akun</p>
+                        </div>
+
+                        <div class="form-section">
+                            <label class="form-label">Konfirmasi PIN *</label>
+                            <input type="password" id="register-pin-confirm" class="form-input pin-input" placeholder="••••••" maxlength="6" inputmode="numeric" pattern="[0-9]{6}" required>
+                        </div>
+
+                        <!-- Address -->
+                        <div class="form-divider">Alamat Pengiriman</div>
+
+                        <div class="form-section">
+                            <label class="form-label">Alamat Lengkap *</label>
+                            <textarea id="register-address" class="form-textarea" rows="2" placeholder="Jl. Contoh No. 123, RT/RW" required></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-section flex-1">
+                                <label class="form-label">Kelurahan</label>
+                                <input type="text" id="register-kelurahan" class="form-input" placeholder="Kelurahan">
+                            </div>
+                            <div class="form-section flex-1">
+                                <label class="form-label">Kecamatan</label>
+                                <input type="text" id="register-kecamatan" class="form-input" placeholder="Kecamatan">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-section flex-1">
+                                <label class="form-label">Kota *</label>
+                                <input type="text" id="register-city" class="form-input" placeholder="Jakarta" required>
+                            </div>
+                            <div class="form-section w-28">
+                                <label class="form-label">Kode Pos</label>
+                                <input type="text" id="register-postal" class="form-input" placeholder="12345" inputmode="numeric">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-auth-submit mt-4">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                            </svg>
+                            Daftar Sekarang
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Edit User Profile -->
+        <div id="modal-edit-profile" class="modal">
+            <div class="modal-overlay" onclick="closeModal('modal-edit-profile')"></div>
+            <div class="modal-content modal-full">
+                <div class="modal-header">
+                    <button onclick="closeModal('modal-edit-profile')" class="modal-back">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    <h2 class="modal-title">Edit Profil</h2>
+                    <button onclick="saveUserProfile()" class="modal-save">Simpan</button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-edit-profile" class="form-container">
+                        <!-- Avatar -->
+                        <div class="form-section">
+                            <label class="form-label">Foto Profil</label>
+                            <div class="customer-avatar-picker">
+                                <div id="edit-avatar-preview" class="customer-avatar-preview" onclick="toggleEditAvatarPicker()">
+                                    <span class="text-4xl">👤</span>
+                                </div>
+                                <div class="flex-1">
+                                    <input type="url" id="edit-avatar-url" class="form-input mb-2" placeholder="URL foto profil..." oninput="updateEditAvatarPreview()">
+                                    <p class="form-hint">Atau pilih avatar dengan tap gambar</p>
+                                </div>
+                            </div>
+                            <div id="edit-avatar-picker" class="emoji-picker hidden">
+                                <!-- Rendered by JS -->
+                            </div>
+                            <input type="hidden" id="edit-avatar-emoji" value="👤">
+                        </div>
+
+                        <div class="form-section">
+                            <label class="form-label">Nama Lengkap *</label>
+                            <input type="text" id="edit-user-name" class="form-input" placeholder="Nama lengkap Anda" required>
+                        </div>
+
+                        <div class="form-section">
+                            <label class="form-label">Nomor WhatsApp</label>
+                            <div class="input-with-prefix">
+                                <span class="input-prefix">+62</span>
+                                <input type="tel" id="edit-user-phone" class="form-input" disabled>
+                            </div>
+                            <p class="form-hint">Nomor HP tidak dapat diubah</p>
+                        </div>
+
+                        <div class="form-section">
+                            <label class="form-label">Email</label>
+                            <input type="email" id="edit-user-email" class="form-input" placeholder="email@example.com" inputmode="email">
+                        </div>
+
+                        <!-- Address -->
+                        <div class="form-divider">Alamat Pengiriman</div>
+
+                        <div class="form-section">
+                            <label class="form-label">Alamat Lengkap *</label>
+                            <textarea id="edit-user-address" class="form-textarea" rows="2" placeholder="Jl. Contoh No. 123, RT/RW" required></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-section flex-1">
+                                <label class="form-label">Kelurahan</label>
+                                <input type="text" id="edit-user-kelurahan" class="form-input" placeholder="Kelurahan">
+                            </div>
+                            <div class="form-section flex-1">
+                                <label class="form-label">Kecamatan</label>
+                                <input type="text" id="edit-user-kecamatan" class="form-input" placeholder="Kecamatan">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-section flex-1">
+                                <label class="form-label">Kota *</label>
+                                <input type="text" id="edit-user-city" class="form-input" placeholder="Jakarta" required>
+                            </div>
+                            <div class="form-section w-28">
+                                <label class="form-label">Kode Pos</label>
+                                <input type="text" id="edit-user-postal" class="form-input" placeholder="12345" inputmode="numeric">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Change PIN -->
+        <div id="modal-change-pin" class="modal">
+            <div class="modal-overlay" onclick="closeModal('modal-change-pin')"></div>
+            <div class="modal-content modal-center" style="max-width: 380px;">
+                <div class="auth-modal-content">
+                    <div class="auth-modal-header">
+                        <div class="auth-modal-icon">🔒</div>
+                        <h3 class="auth-modal-title">Ubah PIN</h3>
+                        <p class="auth-modal-subtitle">Masukkan PIN lama dan PIN baru</p>
+                    </div>
+                    <form id="form-change-pin" class="auth-form" onsubmit="handleChangePin(event)">
+                        <div class="form-section">
+                            <label class="form-label">PIN Lama</label>
+                            <input type="password" id="old-pin" class="form-input pin-input" placeholder="••••••" maxlength="6" inputmode="numeric" pattern="[0-9]{6}" required>
+                        </div>
+                        <div class="form-section">
+                            <label class="form-label">PIN Baru (6 digit)</label>
+                            <input type="password" id="new-pin" class="form-input pin-input" placeholder="••••••" maxlength="6" inputmode="numeric" pattern="[0-9]{6}" required>
+                        </div>
+                        <div class="form-section">
+                            <label class="form-label">Konfirmasi PIN Baru</label>
+                            <input type="password" id="new-pin-confirm" class="form-input pin-input" placeholder="••••••" maxlength="6" inputmode="numeric" pattern="[0-9]{6}" required>
+                        </div>
+                        <button type="submit" class="btn-auth-submit">
+                            Ubah PIN
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: My Orders -->
+        <div id="modal-my-orders" class="modal">
+            <div class="modal-overlay" onclick="closeModal('modal-my-orders')"></div>
+            <div class="modal-content modal-full">
+                <div class="modal-header">
+                    <button onclick="closeModal('modal-my-orders')" class="modal-back">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    <h2 class="modal-title">Pesanan Saya</h2>
+                    <div class="w-10"></div>
+                </div>
+                <div class="modal-body p-0">
+                    <div id="my-orders-list" class="orders-list">
+                        <!-- Rendered by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Customer Order Detail -->
+        <div id="modal-customer-order-detail" class="modal">
+            <div class="modal-overlay" onclick="closeModal('modal-customer-order-detail')"></div>
+            <div class="modal-content modal-full">
+                <div class="modal-header">
+                    <button onclick="closeCustomerOrderDetail()" class="modal-back">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    <h2 class="modal-title">Detail Pesanan</h2>
+                    <div class="w-10"></div>
+                </div>
+                <div class="modal-body">
+                    <div id="customer-order-detail-content">
+                        <!-- Rendered by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Payment Confirmation -->
+        <div id="modal-payment" class="modal">
+            <div class="modal-overlay"></div>
+            <div class="modal-content modal-center" style="max-width: 380px;">
+                <div class="payment-modal-content">
+                    <div class="payment-icon">🏦</div>
+                    <h3 class="payment-title">Informasi Pembayaran</h3>
+                    <div id="payment-bank-info" class="payment-bank-info">
+                        <!-- Rendered by JS -->
+                    </div>
+                    <div id="payment-amount" class="payment-amount">
+                        <!-- Rendered by JS -->
+                    </div>
+                    <p class="payment-instruction">Setelah transfer, pesanan akan diproses dan dikirim ke alamat Anda.</p>
+                    <div class="payment-actions">
+                        <button onclick="cancelPayment()" class="btn-secondary flex-1">Batal</button>
+                        <button onclick="confirmPayment()" class="btn-primary flex-1">✅ Sudah Bayar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Cancel Order Confirmation -->
+        <div id="modal-cancel-order" class="modal">
+            <div class="modal-overlay" onclick="closeModal('modal-cancel-order')"></div>
+            <div class="modal-content modal-center">
+                <div class="delete-modal-content">
+                    <div class="delete-icon">❌</div>
+                    <h3 class="delete-title">Batalkan Pesanan?</h3>
+                    <p id="cancel-order-text" class="delete-text">Pesanan akan dibatalkan dan tidak dapat dikembalikan.</p>
+                    <div class="delete-actions">
+                        <button onclick="closeModal('modal-cancel-order')" class="btn-secondary flex-1">Kembali</button>
+                        <button onclick="confirmCancelOrder()" class="btn-danger flex-1">Ya, Batalkan</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Admin Login -->
+        <div id="modal-admin-login" class="modal">
+            <div class="modal-overlay" onclick="closeModal('modal-admin-login')"></div>
+            <div class="modal-content modal-center" style="max-width: 380px;">
+                <div class="auth-modal-content">
+                    <div class="auth-modal-header">
+                        <div class="auth-modal-icon">🔐</div>
+                        <h3 class="auth-modal-title">Login Admin</h3>
+                        <p class="auth-modal-subtitle">Masuk untuk mengelola toko</p>
+                    </div>
+                    <form id="form-admin-login" class="auth-form" onsubmit="handleAdminLogin(event)">
+                        <div class="form-section">
+                            <label class="form-label">Username</label>
+                            <input type="text" id="admin-login-username" class="form-input" placeholder="Username admin" required>
+                        </div>
+                        <div class="form-section">
+                            <label class="form-label">Password</label>
+                            <input type="password" id="admin-login-password" class="form-input" placeholder="Password" required>
+                        </div>
+                        <button type="submit" class="btn-auth-submit">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                            </svg>
+                            Masuk
+                        </button>
+                    </form>
+                    <div class="auth-modal-footer">
+                        <p>Belum punya akun admin? <button onclick="closeModal('modal-admin-login'); openModal('modal-admin-register')" class="auth-link">Daftar</button></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Admin Register -->
+        <div id="modal-admin-register" class="modal">
+            <div class="modal-overlay" onclick="closeModal('modal-admin-register')"></div>
+            <div class="modal-content modal-full">
+                <div class="modal-header">
+                    <button onclick="closeModal('modal-admin-register')" class="modal-back">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    <h2 class="modal-title">Daftar Admin</h2>
+                    <div class="w-10"></div>
+                </div>
+                <div class="modal-body">
+                    <form id="form-admin-register" class="form-container" onsubmit="handleAdminRegister(event)">
+                        <!-- Admin Avatar -->
+                        <div class="form-section">
+                            <label class="form-label">Foto Profil Admin</label>
+                            <div class="customer-avatar-picker">
+                                <div id="admin-avatar-preview" class="customer-avatar-preview" onclick="toggleAdminAvatarPicker()">
+                                    <span class="text-4xl">👨‍💼</span>
+                                </div>
+                                <div class="flex-1">
+                                    <input type="url" id="admin-avatar-url" class="form-input mb-2" placeholder="URL foto profil..." oninput="updateAdminAvatarPreview()">
+                                    <p class="form-hint">Atau pilih avatar dengan tap gambar</p>
+                                </div>
+                            </div>
+                            <div id="admin-avatar-picker" class="emoji-picker hidden">
+                                <!-- Rendered by JS -->
+                            </div>
+                            <input type="hidden" id="admin-avatar-emoji" value="👨‍💼">
+                        </div>
+
+                        <!-- Basic Info -->
+                        <div class="form-section">
+                            <label class="form-label">Nama Lengkap *</label>
+                            <input type="text" id="admin-register-name" class="form-input" placeholder="Nama admin" required>
+                        </div>
+
+                        <div class="form-section">
+                            <label class="form-label">Username *</label>
+                            <input type="text" id="admin-register-username" class="form-input" placeholder="Username untuk login" required>
+                            <p class="form-hint">Username harus unik, minimal 4 karakter</p>
+                        </div>
+
+                        <div class="form-section">
+                            <label class="form-label">Nomor WhatsApp *</label>
+                            <div class="input-with-prefix">
+                                <span class="input-prefix">+62</span>
+                                <input type="tel" id="admin-register-phone" class="form-input" placeholder="812xxxxxxxx" inputmode="tel" required>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <label class="form-label">Email</label>
+                            <input type="email" id="admin-register-email" class="form-input" placeholder="email@example.com" inputmode="email">
+                        </div>
+
+                        <!-- Password -->
+                        <div class="form-divider">Keamanan</div>
+
+                        <div class="form-section">
+                            <label class="form-label">Password *</label>
+                            <input type="password" id="admin-register-password" class="form-input" placeholder="Minimal 6 karakter" required>
+                            <p class="form-hint">Password minimal 6 karakter</p>
+                        </div>
+
+                        <div class="form-section">
+                            <label class="form-label">Konfirmasi Password *</label>
+                            <input type="password" id="admin-register-password-confirm" class="form-input" placeholder="Ulangi password" required>
+                        </div>
+
+                        <!-- Referral Code -->
+                        <div class="form-divider">Kode Referensi</div>
+
+                        <div class="form-section">
+                            <label class="form-label">Referensi Code *</label>
+                            <input type="text" id="admin-register-referral" class="form-input referral-input" placeholder="Masukkan kode dari Owner" style="text-transform: uppercase; letter-spacing: 2px; font-weight: 600;" maxlength="8">
+                            <p class="form-hint">Kode referensi 8 karakter dari Owner. Role ditentukan oleh kode.</p>
+                        </div>
+
+                        <input type="hidden" id="admin-register-role" value="">
+
+                        <button type="submit" class="btn-auth-submit mt-4">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                            </svg>
+                            Daftar sebagai Admin
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Admin Profile -->
+        <div id="modal-admin-profile" class="modal">
+            <div class="modal-overlay" onclick="closeModal('modal-admin-profile')"></div>
+            <div class="modal-content modal-full">
+                <div class="modal-header">
+                    <button onclick="closeModal('modal-admin-profile')" class="modal-back">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    <h2 class="modal-title">Profil Admin</h2>
+                    <button onclick="saveAdminProfile()" class="modal-save">Simpan</button>
+                </div>
+                <div class="modal-body">
+                    <div id="admin-profile-content">
+                        <!-- Rendered by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Manage Admins (Owner only) -->
+        <div id="modal-manage-admins" class="modal">
+            <div class="modal-overlay" onclick="closeModal('modal-manage-admins')"></div>
+            <div class="modal-content modal-full">
+                <div class="modal-header">
+                    <button onclick="closeModal('modal-manage-admins')" class="modal-back">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    <h2 class="modal-title">Kelola Admin</h2>
+                    <button onclick="openModal('modal-referral-codes')" class="modal-action" title="Kelola Referensi Code">
+                        🔑
+                    </button>
+                </div>
+                <div class="modal-body p-0">
+                    <!-- Referral Code Info -->
+                    <div class="referral-info-banner">
+                        <span class="referral-info-icon">🔑</span>
+                        <div class="referral-info-text">
+                            <strong>Referensi Code diperlukan untuk register admin baru</strong>
+                            <p>Klik 🔑 untuk membuat dan mengelola kode referensi</p>
+                        </div>
+                    </div>
+                    
+                    <div id="admins-list" class="customers-list">
+                        <!-- Rendered by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Referral Codes Management -->
+        <div id="modal-referral-codes" class="modal">
+            <div class="modal-overlay" onclick="closeModal('modal-referral-codes')"></div>
+            <div class="modal-content modal-full">
+                <div class="modal-header">
+                    <button onclick="closeModal('modal-referral-codes')" class="modal-back">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    <h2 class="modal-title">🔑 Kelola Referensi</h2>
+                    <div class="w-10"></div>
+                </div>
+                <div class="modal-body">
+                    <!-- Create New Code -->
+                    <div class="referral-create-section">
+                        <h4 class="referral-section-title">Buat Kode Referensi Baru</h4>
+                        <div class="form-section">
+                            <label class="form-label">Role untuk Kode Ini</label>
+                            <select id="referral-role" class="form-select">
+                                <option value="admin">⚙️ Admin</option>
+                                <option value="staff">👤 Staff</option>
+                            </select>
+                        </div>
+                        <div class="form-section">
+                            <label class="form-label">Batas Penggunaan</label>
+                            <select id="referral-limit" class="form-select">
+                                <option value="1">1 kali</option>
+                                <option value="3">3 kali</option>
+                                <option value="5">5 kali</option>
+                                <option value="10">10 kali</option>
+                                <option value="0">Unlimited</option>
+                            </select>
+                        </div>
+                        <button onclick="generateReferralCode()" class="btn-generate-code">
+                            🔑 Buat Kode Baru
+                        </button>
+                    </div>
+
+                    <!-- Existing Codes List -->
+                    <div class="referral-list-section">
+                        <h4 class="referral-section-title">Daftar Kode Referensi</h4>
+                        <div id="referral-codes-list" class="referral-codes-list">
+                            <!-- Rendered by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Firebase & Database Setup -->
+        <div id="modal-firebase" class="modal">
+            <div class="modal-overlay" onclick="closeModal('modal-firebase')"></div>
+            <div class="modal-content modal-full">
+                <div class="modal-header">
+                    <button onclick="closeModal('modal-firebase')" class="modal-back">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    <h2 class="modal-title">Firebase & Database</h2>
+                    <div class="w-10"></div>
+                </div>
+                <div class="modal-body">
+                    <!-- Firebase Status -->
+                    <div id="firebase-status-card" class="firebase-status-card disconnected">
+                        <div class="firebase-status-icon">🔴</div>
+                        <div class="firebase-status-info">
+                            <h4 class="firebase-status-title">Tidak Terhubung</h4>
+                            <p class="firebase-status-desc">Firebase belum dikonfigurasi</p>
+                        </div>
+                    </div>
+
+                    <!-- Tabs -->
+                    <div class="firebase-tabs">
+                        <button class="firebase-tab active" onclick="switchFirebaseTab('config')">⚙️ Konfigurasi</button>
+                        <button class="firebase-tab" onclick="switchFirebaseTab('sync')">🔄 Sync Data</button>
+                        <button class="firebase-tab" onclick="switchFirebaseTab('backup')">💾 Backup</button>
+                    </div>
+
+                    <!-- Tab: Config -->
+                    <div id="firebase-tab-config" class="firebase-tab-content active">
+                        <form id="form-firebase" class="form-container">
+                            <div class="firebase-info-box">
+                                <span class="firebase-info-icon">ℹ️</span>
+                                <div class="firebase-info-text">
+                                    <strong>Cara mendapatkan Firebase Config:</strong>
+                                    <ol>
+                                        <li>Buka <a href="https://console.firebase.google.com" target="_blank">Firebase Console</a></li>
+                                        <li>Buat project baru atau pilih yang sudah ada</li>
+                                        <li>Klik ⚙️ Project Settings</li>
+                                        <li>Scroll ke "Your apps" → Web app</li>
+                                        <li>Copy konfigurasi SDK</li>
+                                    </ol>
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <label class="form-label">API Key *</label>
+                                <input type="text" id="firebase-api-key" class="form-input" placeholder="AIzaSy...">
+                            </div>
+
+                            <div class="form-section">
+                                <label class="form-label">Auth Domain *</label>
+                                <input type="text" id="firebase-auth-domain" class="form-input" placeholder="your-project.firebaseapp.com">
+                            </div>
+
+                            <div class="form-section">
+                                <label class="form-label">Project ID *</label>
+                                <input type="text" id="firebase-project-id" class="form-input" placeholder="your-project-id">
+                            </div>
+
+                            <div class="form-section">
+                                <label class="form-label">Storage Bucket</label>
+                                <input type="text" id="firebase-storage-bucket" class="form-input" placeholder="your-project.appspot.com">
+                            </div>
+
+                            <div class="form-section">
+                                <label class="form-label">Messaging Sender ID</label>
+                                <input type="text" id="firebase-messaging-id" class="form-input" placeholder="123456789">
+                            </div>
+
+                            <div class="form-section">
+                                <label class="form-label">App ID *</label>
+                                <input type="text" id="firebase-app-id" class="form-input" placeholder="1:123456789:web:abc123">
+                            </div>
+
+                            <div class="form-section">
+                                <label class="form-label">Measurement ID</label>
+                                <input type="text" id="firebase-measurement-id" class="form-input" placeholder="G-XXXXXXXXXX">
+                            </div>
+
+                            <div class="firebase-actions">
+                                <button type="button" onclick="testFirebaseConnection()" class="btn-firebase-test">
+                                    🔌 Test Koneksi
+                                </button>
+                                <button type="button" onclick="saveFirebaseConfig()" class="btn-primary flex-1">
+                                    💾 Simpan Konfigurasi
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Tab: Sync -->
+                    <div id="firebase-tab-sync" class="firebase-tab-content">
+                        <div class="sync-section">
+                            <h4 class="sync-title">📤 Upload ke Cloud</h4>
+                            <p class="sync-desc">Upload semua data lokal ke Firebase Database</p>
+                            
+                            <div class="sync-options">
+                                <label class="sync-checkbox">
+                                    <input type="checkbox" id="sync-profile" checked>
+                                    <span>🏪 Profil Toko</span>
+                                </label>
+                                <label class="sync-checkbox">
+                                    <input type="checkbox" id="sync-products" checked>
+                                    <span>📦 Produk (<span id="sync-products-count">0</span>)</span>
+                                </label>
+                                <label class="sync-checkbox">
+                                    <input type="checkbox" id="sync-orders" checked>
+                                    <span>📋 Pesanan (<span id="sync-orders-count">0</span>)</span>
+                                </label>
+                                <label class="sync-checkbox">
+                                    <input type="checkbox" id="sync-customers" checked>
+                                    <span>👥 Pelanggan (<span id="sync-customers-count">0</span>)</span>
+                                </label>
+                                <label class="sync-checkbox">
+                                    <input type="checkbox" id="sync-admins" checked>
+                                    <span>👨‍💼 Admin (<span id="sync-admins-count">0</span>)</span>
+                                </label>
+                            </div>
+
+                            <button onclick="uploadToFirebase()" class="btn-sync-upload" id="btn-upload-firebase">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                                </svg>
+                                Upload ke Firebase
+                            </button>
+                        </div>
+
+                        <div class="sync-divider"></div>
+
+                        <div class="sync-section">
+                            <h4 class="sync-title">📥 Download dari Cloud</h4>
+                            <p class="sync-desc">Download data dari Firebase ke perangkat ini</p>
+                            
+                            <div class="sync-warning">
+                                ⚠️ Data lokal akan ditimpa dengan data dari cloud
+                            </div>
+
+                            <button onclick="downloadFromFirebase()" class="btn-sync-download" id="btn-download-firebase">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"/>
+                                </svg>
+                                Download dari Firebase
+                            </button>
+                        </div>
+
+                        <div class="sync-divider"></div>
+
+                        <div class="sync-section">
+                            <h4 class="sync-title">🔄 Auto Sync</h4>
+                            <p class="sync-desc">Sinkronisasi otomatis saat ada perubahan data</p>
+                            
+                            <div class="auto-sync-toggle">
+                                <span>Auto Sync</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="auto-sync-toggle" onchange="toggleAutoSync()">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab: Backup -->
+                    <div id="firebase-tab-backup" class="firebase-tab-content">
+                        <div class="backup-section">
+                            <h4 class="backup-title">💾 Export Data (JSON)</h4>
+                            <p class="backup-desc">Download semua data sebagai file JSON untuk backup</p>
+                            
+                            <button onclick="exportDataJSON()" class="btn-backup-export">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                Export JSON
+                            </button>
+                        </div>
+
+                        <div class="backup-divider"></div>
+
+                        <div class="backup-section">
+                            <h4 class="backup-title">📂 Import Data (JSON)</h4>
+                            <p class="backup-desc">Restore data dari file JSON backup</p>
+                            
+                            <div class="backup-warning">
+                                ⚠️ Data saat ini akan ditimpa dengan data dari file
+                            </div>
+
+                            <label class="btn-backup-import">
+                                <input type="file" id="import-file" accept=".json" onchange="importDataJSON(event)" hidden>
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                                </svg>
+                                Import JSON
+                            </label>
+                        </div>
+
+                        <div class="backup-divider"></div>
+
+                        <div class="backup-section">
+                            <h4 class="backup-title">🗑️ Reset Data</h4>
+                            <p class="backup-desc">Hapus semua data dan kembalikan ke default</p>
+                            
+                            <button onclick="resetAllData()" class="btn-backup-reset">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                </svg>
+                                Reset Semua Data
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Checkout Form (for guest and logged-in users) -->
+        <div id="modal-checkout" class="modal">
+            <div class="modal-overlay" onclick="closeModal('modal-checkout')"></div>
+            <div class="modal-content modal-full">
+                <div class="modal-header">
+                    <button onclick="closeModal('modal-checkout')" class="modal-back">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    <h2 class="modal-title">Checkout</h2>
+                    <div class="w-10"></div>
+                </div>
+                <div class="modal-body">
+                    <form id="form-checkout" class="form-container" onsubmit="processCheckout(event)">
+                        <!-- Order Summary -->
+                        <div class="checkout-order-summary">
+                            <h4 class="checkout-summary-title">Ringkasan Pesanan</h4>
+                            <div id="checkout-items-summary" class="checkout-items-summary">
+                                <!-- Rendered by JS -->
+                            </div>
+                            <div class="checkout-total-row">
+                                <span>Total</span>
+                                <span id="checkout-total" class="checkout-total-value">Rp 0</span>
+                            </div>
+                        </div>
+
+                        <!-- Customer Info -->
+                        <div class="form-divider">Data Penerima</div>
+
+                        <div class="form-section">
+                            <label class="form-label">Nama Lengkap *</label>
+                            <input type="text" id="checkout-name" class="form-input" placeholder="Nama penerima" required>
+                        </div>
+
+                        <div class="form-section">
+                            <label class="form-label">Nomor WhatsApp *</label>
+                            <div id="checkout-phone-container" class="input-with-prefix">
+                                <span class="input-prefix">+62</span>
+                                <input type="tel" id="checkout-phone" class="form-input" placeholder="812xxxxxxxx" inputmode="tel" required>
+                            </div>
+                            <p id="checkout-phone-hint" class="form-hint hidden">Nomor terdaftar, tidak dapat diubah</p>
+                        </div>
+
+                        <div class="form-section">
+                            <label class="form-label">Alamat Lengkap *</label>
+                            <textarea id="checkout-address" class="form-textarea" rows="3" placeholder="Alamat lengkap pengiriman" required></textarea>
+                            <p id="checkout-address-hint" class="form-hint hidden">Alamat dari profil Anda, dapat diedit jika perlu</p>
+                        </div>
+
+                        <div class="form-section">
+                            <label class="form-label">Catatan (opsional)</label>
+                            <textarea id="checkout-notes" class="form-textarea" rows="2" placeholder="Catatan untuk pesanan..."></textarea>
+                        </div>
+
+                        <button type="submit" class="btn-checkout mt-4">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                            </svg>
+                            Pesan via WhatsApp
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Container -->
+        <div id="toast-container" class="toast-container"></div>
+
+    </div>
+
+    <!-- External JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
